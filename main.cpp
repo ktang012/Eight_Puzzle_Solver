@@ -12,9 +12,16 @@ vector<string> GetCustomInput(string &input) {
     input.erase(remove(input.begin(), input.end(), ' '), input.end());
     vector<string> puzzle_row;
     for (unsigned i = 0; i < puzzle_size; ++i) {
-        puzzle_row.push_back(string(1, input.at(i)));
+        puzzle_row.push_back(string(1, input.at(i))); // make string of size 1 with char input.at(i)
     }
     return puzzle_row;
+}
+
+void PrintDashes() {
+    for (unsigned i = 0; i < 12; ++i) {
+        cout << "-";
+    }
+    cout << endl;
 }
 
 int main() {
@@ -48,6 +55,24 @@ int main() {
 
     cout << "Initial state of puzzle: " << endl;
     my_puzzle.puzzle_state::PrintPuzzle();
+    my_puzzle.puzzle_state::MTCost();
+    PrintDashes();
+    my_puzzle.puzzle_state::MoveUp();
+    my_puzzle.puzzle_state::PrintPuzzle();
+    my_puzzle.puzzle_state::MTCost();
+    PrintDashes();
+    my_puzzle.puzzle_state::MoveDown();
+    my_puzzle.puzzle_state::PrintPuzzle();
+    my_puzzle.puzzle_state::MTCost();
+    PrintDashes();
+    my_puzzle.puzzle_state::MoveLeft();
+    my_puzzle.puzzle_state::PrintPuzzle();
+    my_puzzle.puzzle_state::MTCost();
+    PrintDashes();
+    my_puzzle.puzzle_state::MoveRight();
+    my_puzzle.puzzle_state::PrintPuzzle();
+    my_puzzle.puzzle_state::MTCost();
+    PrintDashes();
 
     return 0;
 }
