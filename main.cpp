@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <algorithm>
 #include "puzzle_state.h"
 
@@ -7,12 +8,13 @@ using namespace std;
 
 // Breaks three input into individual strings for puzzle row
 // 'input.at(i)' returns a char!
+// Only supports 8-puzzle input tiles (0 to 8)
 vector<string> GetCustomInput(string &input) {
     getline(cin, input);
     input.erase(remove(input.begin(), input.end(), ' '), input.end());
     vector<string> puzzle_row;
     for (unsigned i = 0; i < puzzle_size; ++i) {
-        puzzle_row.push_back(string(1, input.at(i))); // make string of size 1 with char input.at(i)
+        puzzle_row.push_back(string(1, input.at(i)));
     }
     return puzzle_row;
 }
@@ -22,6 +24,27 @@ void PrintDashes() {
         cout << "-";
     }
     cout << endl;
+}
+
+void PrintState(puzzle_state my_puzzle) {
+    PrintDashes();
+    my_puzzle.puzzle_state::PrintPuzzle();
+    PrintDashes();
+    my_puzzle.puzzle_state::MTCost();
+    my_puzzle.puzzle_state::MDCost();
+    PrintDashes();
+}
+
+void UniformCost(puzzle_state &my_puzzle) {
+
+}
+
+void A_StarMT(puzzle_state &my_puzzle) {
+
+}
+
+void A_StarMD(puzzle_state &my_puzzle) {
+
 }
 
 int main() {
@@ -49,30 +72,40 @@ int main() {
         }
         else {
             cout << "Invalid input." << endl;
+            input.clear();
         }
     }
-    puzzle_state my_puzzle(puzzle);
 
-    cout << "Initial state of puzzle: " << endl;
-    my_puzzle.puzzle_state::PrintPuzzle();
-    my_puzzle.puzzle_state::MTCost();
-    PrintDashes();
-    my_puzzle.puzzle_state::MoveUp();
-    my_puzzle.puzzle_state::PrintPuzzle();
-    my_puzzle.puzzle_state::MTCost();
-    PrintDashes();
-    my_puzzle.puzzle_state::MoveDown();
-    my_puzzle.puzzle_state::PrintPuzzle();
-    my_puzzle.puzzle_state::MTCost();
-    PrintDashes();
-    my_puzzle.puzzle_state::MoveLeft();
-    my_puzzle.puzzle_state::PrintPuzzle();
-    my_puzzle.puzzle_state::MTCost();
-    PrintDashes();
-    my_puzzle.puzzle_state::MoveRight();
-    my_puzzle.puzzle_state::PrintPuzzle();
-    my_puzzle.puzzle_state::MTCost();
-    PrintDashes();
+    puzzle_state my_puzzle(puzzle);
+    puzzle_state new_puzzle = my_puzzle.puzzle_state::CreateUp(my_puzzle);
+    puzzle_state new_new_puzzle = new_puzzle.puzzle_state::CreateLeft(new_puzzle);
+    PrintState(my_puzzle);
+    PrintState(*(new_new_puzzle.GetPrevState()));
+
+
+    // while (1) {
+    //     cout << "Enter your choice of algorithm" << endl;
+    //     cout << "1 for Uniform Cost Search" << endl;
+    //     cout << "2 for A* with Misplaced Tile heuristic" << endl;
+    //     cout << "3 for A* with Manhattan distance heuristic" << endl;
+    //     cin >> input;
+    //     if (input == "1") {
+    //         UniformCost(my_puzzle);
+    //         break;
+    //     }
+    //     else if (input == "2") {
+    //         A_StarMT(my_puzzle);
+    //         break;
+    //     }
+    //     else if (input == "3") {
+    //         A_StarMD(my_puzzle);
+    //         break;
+    //     }
+    //     else {
+    //         cout << "Invalid input." << endl;
+    //         input.clear();
+    //     }
+    // }
 
     return 0;
 }

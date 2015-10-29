@@ -2,6 +2,7 @@
 #define PUZZLE_STATE_H
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <utility>
 
 using namespace std;
@@ -141,13 +142,13 @@ class puzzle_state {
 
         // calculate stuff
         unsigned MTCost() {
+            unsigned num_MT = 0;
             vector<int> puzzle_map;
             for (unsigned i = 0; i < puzzle.size(); ++i) {
                 for (unsigned j = 0; j < puzzle.at(i).size(); ++j) {
                     puzzle_map.push_back(stoi(puzzle.at(i).at(j)));
                 }
             }
-            unsigned num_MT = 0;
             for (unsigned i = 0; i < puzzle_map.size() - 1; ++i) {
                 if (puzzle_map.at(i) != i + 1) {
                     num_MT += 1;
@@ -156,12 +157,49 @@ class puzzle_state {
             if (puzzle_map.at(puzzle_map.size() - 1) != 0) {
                 num_MT += 1;
             }
-            // cout << "MT: " << num_MT << endl;
+            cout << "MT: " << num_MT << endl;
             return num_MT;
         }
         unsigned MDCost() {
+            unsigned num_MD = 0;
+            unsigned MD_sum = 0;
+            int num = 1;
+            // Checks from 0,0 to i,j-1 -- last tile on board
+            // Need to check 0 manually
+            for (int i = 0; i < puzzle.size(); ++i) {
+                for (int j = 0; j < puzzle.at(i).size() && num != puzzle.size() * puzzle.size(); ++j) {
+                    // cout << "Checking " << i << " " << j << " for " << num;
+                    // cout << "... found " << puzzle.at(i).at(j) << endl;
 
+                    // If we find a mismatch we find the position the tile is supposed to be
+                    // in and calculate it
+                    if (puzzle.at(i).at(j) != to_string(num)) {
+                        for(int k = 0; k < puzzle.size(); ++k) {
+                            for (int l = 0; l < puzzle.at(k).size(); ++l) {
+                                if (to_string(num) == puzzle.at(k).at(l)) {
+                                    MD_sum += abs(i - k) + abs(j - l);
+                                    // cout << "MD so far: " << MD_sum << endl;
+                                }
+                            }
+                        }
+                    }
+                    ++num;
+                }
+            }
 
+            if (puzzle.at(puzzle.size()-1).at(puzzle.size()-1) != "0") {
+                for (int i = 0; i < puzzle.size(); ++i) {
+                    for (int j = 0; j < puzzle.size(); ++j) {
+                        if (puzzle.at(i).at(j) == "0") {
+                            int sz = puzzle.size()-1;
+                            // cout << "Found 0 at " << i << " "  << j << endl;
+                            MD_sum += abs(sz - i) + abs(sz- j);
+                        }
+                    }
+                }
+            }
+            cout << "MD: " << MD_sum << endl;
+            return MD_sum;
         }
         pair<int, int> CalcBlank() {
             for (int i = 0; i < puzzle.size(); ++i) {
@@ -177,10 +215,45 @@ class puzzle_state {
             return blank_rc;
         }
 
-        void ExpandState() {
-
+        bool operator==(puzzle_state other) {
+            return ((this->g_cost + this->h_cost) == (other.g_cost + other.h_cost));
+        }
+        bool operator<(puzzle_state other) {
+            return ((this->g_cost + this->h_cost) < (other.g_cost + other.h_cost));
         }
 
-
+        // Performs operation on my_puzzle, sets pointer to implicit object, return my_puzzle
+        puzzle_state CreateUp(puzzle_state my_puzzle) {
+            my_puzzle.MoveUp();
+            my_puzzle.prev_state = this;
+            return my_puzzle;
+        }
+        puzzle_state CreateDown(puzzle_state my_puzzle) {
+            my_puzzle.MoveDown();
+            my_puzzle.prev_state = this;
+            return my_puzzle;
+        }
+        puzzle_state CreateLeft(puzzle_state my_puzzle) {
+            my_puzzle.MoveLeft();
+            my_puzzle.prev_state = this;
+            return my_puzzle;
+        }
+        puzzle_state CreateRight(puzzle_state my_puzzle) {
+            my_puzzle.MoveRight();
+            my_puzzle.prev_state = this;
+            return my_puzzle;
+        }
 };
+
+// explored states is puzzle_state.puzzle -> 2D vector
+void ExpandState(puzzle_state current, priority_queue<puzzle_state> states, \
+                vector<vector<string> > explored_states) {
+    unsigned num_operators = 4;
+    for (unsigned i = 0; i < num_operators; ++i) {
+        break;
+    }
+
+
+}
+
 #endif
