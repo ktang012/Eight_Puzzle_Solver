@@ -79,23 +79,34 @@ int main() {
     }
 
     puzzle_state my_puzzle(puzzle);
-    puzzle_state new_puzzle = my_puzzle.puzzle_state::CreateUp(my_puzzle);
-    puzzle_state new_new_puzzle = new_puzzle.puzzle_state::CreateLeft(new_puzzle);
-    // PrintState(my_puzzle);
-    // PrintState(new_puzzle);
-    // PrintState(new_new_puzzle);
-    my_puzzle.SetCosts("MT");
-    new_puzzle.SetCosts("MT");
-    new_new_puzzle.SetCosts("MT");
+    // puzzle_state new_puzzle = my_puzzle.puzzle_state::CreateUp(my_puzzle);
+    // puzzle_state new_new_puzzle = new_puzzle.puzzle_state::CreateLeft(new_puzzle);
+    // // PrintState(my_puzzle);
+    // // PrintState(new_puzzle);
+    // // PrintState(new_new_puzzle);
+    // my_puzzle.SetCosts("MT");
+    // new_puzzle.SetCosts("MT");
+    // new_new_puzzle.SetCosts("MT");
 
     priority_queue<puzzle_state> states;
-    states.push(my_puzzle);
-    states.push(new_puzzle);
-    states.push(new_new_puzzle);
-
+    vector<string> explored_states;
+    ExpandState(my_puzzle, states, explored_states, "MT");
+    string test;
     while(!states.empty()) {
-        PrintState(states.top());
+        puzzle_state current = states.top();
+        if (CheckGoal(current)) {
+            cout << "Found goal" << endl;
+            PrintState(current);
+            break;
+        }
+        PrintState(current);
         states.pop();
+        ExpandState(current, states, explored_states, "MT");
+        cout << "Explored size: " << explored_states.size() << endl;
+        cin >> test;
+    }
+    for (unsigned i = 0; i < explored_states.size(); ++i) {
+        cout << explored_states.at(i) << endl;
     }
 
 

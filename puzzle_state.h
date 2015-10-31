@@ -238,64 +238,18 @@ class puzzle_state {
             return my_puzzle;
         }
 
-        string map_state(vector<vector<string> > state) {
-            string state_map;
-            for (unsigned i = 0; i < state.size(); ++i) {
-                for (unsigned j = 0; j < state.at(i).size(); ++j) {
-                    state_map.append(state.at(i).at(j));
-                }
-            }
-            return state_map;
-        }
-
-        void ExpandState(puzzle_state current, priority_queue<puzzle_state> &states, \
-                        vector<string> &explored_states) {
-            puzzle_state puzzle_up = current.puzzle_state::CreateUp(current);
-            string up_map = map_state(puzzle_up.puzzle);
-            puzzle_state puzzle_down = current.puzzle_state::CreateDown(current);
-            string down_map = map_state(puzzle_down.puzzle);
-            puzzle_state puzzle_left = current.puzzle_state::CreateLeft(current);
-            string left_map = map_state(puzzle_left.puzzle);
-            puzzle_state puzzle_right = current.puzzle_state::CreateRight(current);
-            string right_map = map_state(puzzle_right.puzzle);
-            bool repeat_up = 0;
-            bool repeat_down = 0;
-            bool repeat_left = 0;
-            bool repeat_right = 0;
-            explored_states.push_back(map_state(current.puzzle));
-            for (unsigned i = 0; i < explored_states.size(); ++i) {
-                if (explored_states.at(i) == up_map) {
-                    cout << "Already explored " << up_map << endl;
-                    repeat_up = 1;
-                    break;
-                }
-                else if (explored_states.at(i) == down_map) {
-                    cout << "Already explored " << down_map << endl;
-                    repeat_down = 1;
-                    break;
-                }
-                else if (explored_states.at(i) == left_map) {
-                    cout << "Already explored " << left_map << endl;
-                    repeat_left = 1;
-                    break;
-                }
-                else if (explored_states.at(i) == right_map) {
-                    cout << "Already explored " << right_map << endl;
-                    repeat_right = 1;
-                    break;
-                }
-            }
-        }
-
         void SetCosts(const string &h) {
             this->g_cost += 1;
             if (h == "MT") {
+                // cout << "Set to: MT" << endl;
                 this->h_cost = MTCost();
             }
             else if (h == "MD") {
+                // cout << "Set to: MD" << endl;
                 this->h_cost = MDCost();
             }
             else {
+                // cout << "Set to default: UCS" << endl;
                 this->h_cost = 0;
             }
         }
@@ -306,6 +260,79 @@ class puzzle_state {
         }
 };
 
+string map_state(vector<vector<string> > state) {
+            string state_map;
+            for (unsigned i = 0; i < state.size(); ++i) {
+                for (unsigned j = 0; j < state.at(i).size(); ++j) {
+                    state_map.append(state.at(i).at(j));
+                }
+            }
+            return state_map;
+        }
+
+void ExpandState(puzzle_state current, priority_queue<puzzle_state> &states, \
+                vector<string> &explored_states, const string &h) {
+    puzzle_state puzzle_up = current.puzzle_state::CreateUp(current);
+    string up_map = map_state(puzzle_up.GetState());
+    puzzle_state puzzle_down = current.puzzle_state::CreateDown(current);
+    string down_map = map_state(puzzle_down.GetState());
+    puzzle_state puzzle_left = current.puzzle_state::CreateLeft(current);
+    string left_map = map_state(puzzle_left.GetState());
+    puzzle_state puzzle_right = current.puzzle_state::CreateRight(current);
+    string right_map = map_state(puzzle_right.GetState());
+    bool repeat_up = 0;
+    bool repeat_down = 0;
+    bool repeat_left = 0;
+    bool repeat_right = 0;
+    explored_states.push_back(map_state(current.GetState()));
+    for (unsigned i = 0; i < explored_states.size(); ++i) {
+        if (explored_states.at(i) == up_map) {
+            // cout << "Already explored " << up_map << endl;
+            repeat_up = 1;
+            break;
+        }
+        else if (explored_states.at(i) == down_map) {
+            // cout << "Already explored " << down_map << endl;
+            repeat_down = 1;
+            break;
+        }
+        else if (explored_states.at(i) == left_map) {
+            // cout << "Already explored " << left_map << endl;
+            repeat_left = 1;
+            break;
+        }
+        else if (explored_states.at(i) == right_map) {
+            // cout << "Already explored " << right_map << endl;
+            repeat_right = 1;
+            break;
+        }
+    }
+    if (!(repeat_up)) {
+        puzzle_up.SetCosts(h);
+        states.push(puzzle_up);
+    }
+    if (!(repeat_down)) {
+        puzzle_down.SetCosts(h);
+        states.push(puzzle_down);
+    }
+    if (!(repeat_left)) {
+        puzzle_left.SetCosts(h);
+        states.push(puzzle_left);
+    }
+    if (!(repeat_right)) {
+        puzzle_right.SetCosts(h);
+        states.push(puzzle_right);
+    }
+}
+
+bool CheckGoal(const puzzle_state &my_puzzle) {
+    string goal = "123456780";
+    string my_state = map_state(my_puzzle.GetState());
+    if (goal == my_state) {
+        return true;
+    }
+    return false;
+}
 
 
 
