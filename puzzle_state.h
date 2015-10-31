@@ -215,7 +215,6 @@ class puzzle_state {
             cout << "f_cost: " << g_cost + h_cost << endl;
         }
 
-
         // Performs operation on my_puzzle, sets pointer to implicit object, return my_puzzle
         puzzle_state CreateUp(puzzle_state my_puzzle) {
             my_puzzle.MoveUp();
@@ -272,13 +271,13 @@ string map_state(vector<vector<string> > state) {
 
 void ExpandState(puzzle_state current, priority_queue<puzzle_state> &states, \
                 vector<string> &explored_states, const string &h) {
-    puzzle_state puzzle_up = current.puzzle_state::CreateUp(current);
+    puzzle_state puzzle_up = current.CreateUp(current);
     string up_map = map_state(puzzle_up.GetState());
-    puzzle_state puzzle_down = current.puzzle_state::CreateDown(current);
+    puzzle_state puzzle_down = current.CreateDown(current);
     string down_map = map_state(puzzle_down.GetState());
-    puzzle_state puzzle_left = current.puzzle_state::CreateLeft(current);
+    puzzle_state puzzle_left = current.CreateLeft(current);
     string left_map = map_state(puzzle_left.GetState());
-    puzzle_state puzzle_right = current.puzzle_state::CreateRight(current);
+    puzzle_state puzzle_right = current.CreateRight(current);
     string right_map = map_state(puzzle_right.GetState());
     bool repeat_up = 0;
     bool repeat_down = 0;
@@ -289,22 +288,18 @@ void ExpandState(puzzle_state current, priority_queue<puzzle_state> &states, \
         if (explored_states.at(i) == up_map) {
             // cout << "Already explored " << up_map << endl;
             repeat_up = 1;
-            break;
         }
         else if (explored_states.at(i) == down_map) {
             // cout << "Already explored " << down_map << endl;
             repeat_down = 1;
-            break;
         }
         else if (explored_states.at(i) == left_map) {
             // cout << "Already explored " << left_map << endl;
             repeat_left = 1;
-            break;
         }
         else if (explored_states.at(i) == right_map) {
             // cout << "Already explored " << right_map << endl;
             repeat_right = 1;
-            break;
         }
     }
     if (!(repeat_up)) {

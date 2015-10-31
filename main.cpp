@@ -34,6 +34,21 @@ void PrintState(puzzle_state my_puzzle) {
     PrintDashes();
 }
 
+void PrintPrev(puzzle_state *prev) {
+    if (prev == NULL) {
+        cout << "Is null" << endl;
+        PrintState(*prev);
+        return;
+    }
+    PrintPrev(prev->GetPrevState());
+    PrintState(*prev);
+}
+
+void PrintPath(vector<puzzle_state> states) {
+    PrintState(states.at(5));
+    PrintState(states.at(4));
+}
+
 void UniformCost(puzzle_state &my_puzzle) {
     vector<string> explored_states;
     priority_queue<puzzle_state> states;
@@ -78,61 +93,42 @@ int main() {
         }
     }
 
-    puzzle_state my_puzzle(puzzle);
-    // puzzle_state new_puzzle = my_puzzle.puzzle_state::CreateUp(my_puzzle);
-    // puzzle_state new_new_puzzle = new_puzzle.puzzle_state::CreateLeft(new_puzzle);
-    // // PrintState(my_puzzle);
-    // // PrintState(new_puzzle);
-    // // PrintState(new_new_puzzle);
-    // my_puzzle.SetCosts("MT");
-    // new_puzzle.SetCosts("MT");
-    // new_new_puzzle.SetCosts("MT");
+    string h_type;
+    cout << "Pick an algorithm: MT, MD, or UCS" << endl;
+    cin >> h_type;
 
+    puzzle_state my_puzzle(puzzle);
     priority_queue<puzzle_state> states;
     vector<string> explored_states;
-    ExpandState(my_puzzle, states, explored_states, "MT");
-    string test;
+    vector<puzzle_state> explored;
+
+    cout << "Initial state: " << endl;
+    PrintState(my_puzzle);
+    states.push(my_puzzle);
+    unsigned max_queue_size = states.size();
     while(!states.empty()) {
+        if (max_queue_size < states.size()) {
+            max_queue_size = states.size();
+        }
         puzzle_state current = states.top();
+        cout << "The best state to is expand is: " << endl;
+        PrintState(current);
+        explored.push_back(current);
         if (CheckGoal(current)) {
-            cout << "Found goal" << endl;
+            cout << "Found goal: " << endl;
             PrintState(current);
+            cout << "Number of unique states: " << explored_states.size() << endl;
+            cout << "Depth of goal node: " << current.GetG_Cost() << endl;
+            cout << "Max queue size: " << max_queue_size << endl;
             break;
         }
-        PrintState(current);
+        // PrintState(current);
         states.pop();
-        ExpandState(current, states, explored_states, "MT");
-        cout << "Explored size: " << explored_states.size() << endl;
-        cin >> test;
-    }
-    for (unsigned i = 0; i < explored_states.size(); ++i) {
-        cout << explored_states.at(i) << endl;
+        ExpandState(current, states, explored_states, h_type);
+        // cout << "Explored size: " << explored_states.size() << endl;
     }
 
 
-    // while (1) {
-    //     cout << "Enter your choice of algorithm" << endl;
-    //     cout << "1 for Uniform Cost Search" << endl;
-    //     cout << "2 for A* with Misplaced Tile heuristic" << endl;
-    //     cout << "3 for A* with Manhattan distance heuristic" << endl;
-    //     cin >> input;
-    //     if (input == "1") {
-    //         UniformCost(my_puzzle);
-    //         break;
-    //     }
-    //     else if (input == "2") {
-    //         A_StarMT(my_puzzle);
-    //         break;
-    //     }
-    //     else if (input == "3") {
-    //         A_StarMD(my_puzzle);
-    //         break;
-    //     }
-    //     else {
-    //         cout << "Invalid input." << endl;
-    //         input.clear();
-    //     }
-    // }
 
     return 0;
 }
