@@ -30,12 +30,14 @@ void PrintState(puzzle_state my_puzzle) {
     PrintDashes();
     my_puzzle.puzzle_state::PrintPuzzle();
     PrintDashes();
-    my_puzzle.puzzle_state::MTCost();
-    my_puzzle.puzzle_state::MDCost();
+    my_puzzle.PrintCost();
     PrintDashes();
 }
 
 void UniformCost(puzzle_state &my_puzzle) {
+    vector<string> explored_states;
+    priority_queue<puzzle_state> states;
+    states.push(my_puzzle);
 
 }
 
@@ -79,8 +81,22 @@ int main() {
     puzzle_state my_puzzle(puzzle);
     puzzle_state new_puzzle = my_puzzle.puzzle_state::CreateUp(my_puzzle);
     puzzle_state new_new_puzzle = new_puzzle.puzzle_state::CreateLeft(new_puzzle);
-    PrintState(my_puzzle);
-    PrintState(*(new_new_puzzle.GetPrevState()));
+    // PrintState(my_puzzle);
+    // PrintState(new_puzzle);
+    // PrintState(new_new_puzzle);
+    my_puzzle.SetCosts("MT");
+    new_puzzle.SetCosts("MT");
+    new_new_puzzle.SetCosts("MT");
+
+    priority_queue<puzzle_state> states;
+    states.push(my_puzzle);
+    states.push(new_puzzle);
+    states.push(new_new_puzzle);
+
+    while(!states.empty()) {
+        PrintState(states.top());
+        states.pop();
+    }
 
 
     // while (1) {

@@ -46,15 +46,6 @@ class puzzle_state {
             h_cost = 0;
             blank = CalcBlank();
         }
-        // Will be used when expanding
-        // Need to code in h_cost
-        puzzle_state(vector<vector<string> > puzzle, puzzle_state* prev, unsigned h_cost) {
-            this->puzzle = puzzle;
-            this->prev_state = prev;
-            g_cost = g_cost + 1;
-            this->h_cost = h_cost;
-            blank = CalcBlank();
-        }
 
         void PrintPuzzle() {
             for (unsigned i = 0; i < puzzle.size(); ++i) {
@@ -64,19 +55,19 @@ class puzzle_state {
                 cout << endl;
             }
         }
-        vector<vector<string> > GetState() {
+        vector<vector<string> > GetState() const {
             return this->puzzle;
         }
-        puzzle_state* GetPrevState() {
+        puzzle_state* GetPrevState() const {
             return this->prev_state;
         }
-        unsigned GetG_Cost() {
+        unsigned GetG_Cost() const {
             return this->g_cost;
         }
-        unsigned GetH_Cost() {
+        unsigned GetH_Cost() const {
             return this->h_cost;
         }
-        pair<int, int> GetBlank() {
+        pair<int, int> GetBlank() const {
             return this->blank;
         }
 
@@ -157,7 +148,7 @@ class puzzle_state {
             if (puzzle_map.at(puzzle_map.size() - 1) != 0) {
                 num_MT += 1;
             }
-            cout << "MT: " << num_MT << endl;
+            // cout << "MT: " << num_MT << endl;
             return num_MT;
         }
         unsigned MDCost() {
@@ -198,7 +189,7 @@ class puzzle_state {
                     }
                 }
             }
-            cout << "MD: " << MD_sum << endl;
+            // cout << "MD: " << MD_sum << endl;
             return MD_sum;
         }
         pair<int, int> CalcBlank() {
@@ -214,13 +205,16 @@ class puzzle_state {
             pair<int, int> blank_rc(-1, -1);
             return blank_rc;
         }
+        unsigned CalcF_Cost() const {
+            return GetG_Cost() + GetH_Cost();
+        }
 
-        bool operator==(puzzle_state other) {
-            return ((this->g_cost + this->h_cost) == (other.g_cost + other.h_cost));
+        void PrintCost() {
+            cout << "g_cost: " << g_cost << endl;
+            cout << "h_cost: " << h_cost << endl;
+            cout << "f_cost: " << g_cost + h_cost << endl;
         }
-        bool operator<(puzzle_state other) {
-            return ((this->g_cost + this->h_cost) < (other.g_cost + other.h_cost));
-        }
+
 
         // Performs operation on my_puzzle, sets pointer to implicit object, return my_puzzle
         puzzle_state CreateUp(puzzle_state my_puzzle) {
@@ -243,17 +237,78 @@ class puzzle_state {
             my_puzzle.prev_state = this;
             return my_puzzle;
         }
+
+        string map_state(vector<vector<string> > state) {
+            string state_map;
+            for (unsigned i = 0; i < state.size(); ++i) {
+                for (unsigned j = 0; j < state.at(i).size(); ++j) {
+                    state_map.append(state.at(i).at(j));
+                }
+            }
+            return state_map;
+        }
+
+        void ExpandState(puzzle_state current, priority_queue<puzzle_state> &states, \
+                        vector<string> &explored_states) {
+            puzzle_state puzzle_up = current.puzzle_state::CreateUp(current);
+            string up_map = map_state(puzzle_up.puzzle);
+            puzzle_state puzzle_down = current.puzzle_state::CreateDown(current);
+            string down_map = map_state(puzzle_down.puzzle);
+            puzzle_state puzzle_left = current.puzzle_state::CreateLeft(current);
+            string left_map = map_state(puzzle_left.puzzle);
+            puzzle_state puzzle_right = current.puzzle_state::CreateRight(current);
+            string right_map = map_state(puzzle_right.puzzle);
+            bool repeat_up = 0;
+            bool repeat_down = 0;
+            bool repeat_left = 0;
+            bool repeat_right = 0;
+            explored_states.push_back(map_state(current.puzzle));
+            for (unsigned i = 0; i < explored_states.size(); ++i) {
+                if (explored_states.at(i) == up_map) {
+                    cout << "Already explored " << up_map << endl;
+                    repeat_up = 1;
+                    break;
+                }
+                else if (explored_states.at(i) == down_map) {
+                    cout << "Already explored " << down_map << endl;
+                    repeat_down = 1;
+                    break;
+                }
+                else if (explored_states.at(i) == left_map) {
+                    cout << "Already explored " << left_map << endl;
+                    repeat_left = 1;
+                    break;
+                }
+                else if (explored_states.at(i) == right_map) {
+                    cout << "Already explored " << right_map << endl;
+                    repeat_right = 1;
+                    break;
+                }
+            }
+        }
+
+        void SetCosts(const string &h) {
+            this->g_cost += 1;
+            if (h == "MT") {
+                this->h_cost = MTCost();
+            }
+            else if (h == "MD") {
+                this->h_cost = MDCost();
+            }
+            else {
+                this->h_cost = 0;
+            }
+        }
+
+        // Want lowest value!
+        bool operator<(const puzzle_state &lhs) const {
+            return !(this->CalcF_Cost() < lhs.CalcF_Cost());
+        }
 };
 
-// explored states is puzzle_state.puzzle -> 2D vector
-void ExpandState(puzzle_state current, priority_queue<puzzle_state> states, \
-                vector<vector<string> > explored_states) {
-    unsigned num_operators = 4;
-    for (unsigned i = 0; i < num_operators; ++i) {
-        break;
-    }
 
 
-}
+
+
 
 #endif
