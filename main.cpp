@@ -34,36 +34,6 @@ void PrintState(puzzle_state my_puzzle) {
     PrintDashes();
 }
 
-void PrintPrev(puzzle_state *prev) {
-    if (prev == NULL) {
-        cout << "Is null" << endl;
-        PrintState(*prev);
-        return;
-    }
-    PrintPrev(prev->GetPrevState());
-    PrintState(*prev);
-}
-
-void PrintPath(vector<puzzle_state> states) {
-    PrintState(states.at(5));
-    PrintState(states.at(4));
-}
-
-void UniformCost(puzzle_state &my_puzzle) {
-    vector<string> explored_states;
-    priority_queue<puzzle_state> states;
-    states.push(my_puzzle);
-
-}
-
-void A_StarMT(puzzle_state &my_puzzle) {
-
-}
-
-void A_StarMD(puzzle_state &my_puzzle) {
-
-}
-
 int main() {
     vector<vector<string> > puzzle;
     string input;
@@ -102,31 +72,39 @@ int main() {
     vector<string> explored_states;
     vector<puzzle_state> explored;
 
-    cout << "Initial state: " << endl;
-    PrintState(my_puzzle);
     states.push(my_puzzle);
+    const unsigned queue_cap = 30000; // used "hardest" 8 puzzle for MD, see attachment
     unsigned max_queue_size = states.size();
-    while(!states.empty()) {
+    unsigned nodes_expanded = 0;
+    while(!states.empty() && states.size() < queue_cap) {
         if (max_queue_size < states.size()) {
             max_queue_size = states.size();
         }
         puzzle_state current = states.top();
-        cout << "The best state to is expand is: " << endl;
-        PrintState(current);
-        explored.push_back(current);
+        states.pop();
         if (CheckGoal(current)) {
             cout << "Found goal: " << endl;
             PrintState(current);
-            cout << "Number of unique states: " << explored_states.size() << endl;
             cout << "Depth of goal node: " << current.GetG_Cost() << endl;
+            cout << "Number of nodes expanded: " << nodes_expanded << endl;
             cout << "Max queue size: " << max_queue_size << endl;
-            break;
+            return 0;
         }
-        // PrintState(current);
-        states.pop();
+        if (max_queue_size != 1) {
+            cout << "The best state to is expand is: " << endl;
+        }
+        else {
+            cout << "Initial state is: " << endl;
+        }
+        PrintState(current);
+        // cout << "Heap size: " << states.size() << endl;
+        explored.push_back(current);
         ExpandState(current, states, explored_states, h_type);
-        // cout << "Explored size: " << explored_states.size() << endl;
+        ++nodes_expanded;
     }
+    cout << "No solution found" << endl;
+    cout << "Number of nodes expanded: " << nodes_expanded << endl;
+    cout << "Max queue size: " << max_queue_size << endl;
 
 
 

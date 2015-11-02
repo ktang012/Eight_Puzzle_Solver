@@ -9,25 +9,10 @@ using namespace std;
 
 const unsigned puzzle_size = 3;
 
-// Place initial state into priority queue based on g_cost + h_cost
-// Expand and place states into priority queue
-    // Calculate g_cost and h_cost of each state
-        // Increment g_cost
-        // MTCost or MDCost h_cost if applicable
-        // Note: When we calculate costs while expanding
-// Get highest priority state, state_i
-// Test state_i if goal
-// Expand state_i and place states into priority queue
-// ...
-// Found state_i is goal
-// Add state_i to list
-// Go to state_i-1, add state_i-1 to list, ..., until NULL
-// Output list in ordered fashion with state representation, g_cost, and h_cost
-
 class puzzle_state {
     private:
         vector<vector<string> > puzzle;
-        puzzle_state* prev_state;
+        puzzle_state* prev_state; // unused -- incorrect implementation, wanted to make a linked list...
         unsigned g_cost;
         unsigned h_cost;
         pair<int, int> blank;
@@ -131,7 +116,8 @@ class puzzle_state {
             }
         }
 
-        // calculate stuff
+        // create a map, check if index + 1 is equal to what's there
+        // but we also have to manually check the last tile for '0'
         unsigned MTCost() {
             unsigned num_MT = 0;
             vector<int> puzzle_map;
@@ -169,7 +155,6 @@ class puzzle_state {
                             for (int l = 0; l < puzzle.at(k).size(); ++l) {
                                 if (to_string(num) == puzzle.at(k).at(l)) {
                                     MD_sum += abs(i - k) + abs(j - l);
-                                    // cout << "MD so far: " << MD_sum << endl;
                                 }
                             }
                         }
@@ -183,13 +168,11 @@ class puzzle_state {
                     for (int j = 0; j < puzzle.size(); ++j) {
                         if (puzzle.at(i).at(j) == "0") {
                             int sz = puzzle.size()-1;
-                            // cout << "Found 0 at " << i << " "  << j << endl;
                             MD_sum += abs(sz - i) + abs(sz- j);
                         }
                     }
                 }
             }
-            // cout << "MD: " << MD_sum << endl;
             return MD_sum;
         }
         pair<int, int> CalcBlank() {
@@ -216,6 +199,7 @@ class puzzle_state {
         }
 
         // Performs operation on my_puzzle, sets pointer to implicit object, return my_puzzle
+        // Wanted to make a linked list of some sort but it didn't work out
         puzzle_state CreateUp(puzzle_state my_puzzle) {
             my_puzzle.MoveUp();
             my_puzzle.prev_state = this;
@@ -240,15 +224,12 @@ class puzzle_state {
         void SetCosts(const string &h) {
             this->g_cost += 1;
             if (h == "MT") {
-                // cout << "Set to: MT" << endl;
                 this->h_cost = MTCost();
             }
             else if (h == "MD") {
-                // cout << "Set to: MD" << endl;
                 this->h_cost = MDCost();
             }
             else {
-                // cout << "Set to default: UCS" << endl;
                 this->h_cost = 0;
             }
         }
@@ -286,38 +267,41 @@ void ExpandState(puzzle_state current, priority_queue<puzzle_state> &states, \
     explored_states.push_back(map_state(current.GetState()));
     for (unsigned i = 0; i < explored_states.size(); ++i) {
         if (explored_states.at(i) == up_map) {
-            // cout << "Already explored " << up_map << endl;
             repeat_up = 1;
         }
         else if (explored_states.at(i) == down_map) {
-            // cout << "Already explored " << down_map << endl;
             repeat_down = 1;
         }
         else if (explored_states.at(i) == left_map) {
-            // cout << "Already explored " << left_map << endl;
             repeat_left = 1;
         }
         else if (explored_states.at(i) == right_map) {
-            // cout << "Already explored " << right_map << endl;
             repeat_right = 1;
         }
     }
+    // cout << "------------------------------------------" << endl;
     if (!(repeat_up)) {
         puzzle_up.SetCosts(h);
         states.push(puzzle_up);
+        // cout << "up_map: " << up_map << endl;
     }
     if (!(repeat_down)) {
         puzzle_down.SetCosts(h);
         states.push(puzzle_down);
+        // cout << "down_map: " << down_map << endl;
     }
     if (!(repeat_left)) {
         puzzle_left.SetCosts(h);
         states.push(puzzle_left);
+        // cout << "left_map: " << left_map << endl;
     }
     if (!(repeat_right)) {
         puzzle_right.SetCosts(h);
         states.push(puzzle_right);
+        // cout << "right_map: " << right_map << endl;
     }
+    // cout << "------------------------------------------" << endl;
+
 }
 
 bool CheckGoal(const puzzle_state &my_puzzle) {
