@@ -15,8 +15,7 @@ Manhattan distance heuristic is calculated by each distance of a current tile's 
 position and it's goal position.
 
 ## Bugs
-- Repeats explored sets in only the first few iterations.
-- Doesn't return optimal path
+- Solves puzzle but fails to return linked list of optimal path
 
 
 
