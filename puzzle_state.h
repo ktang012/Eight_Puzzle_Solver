@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <map>
 #include <utility>
 
 using namespace std;
@@ -251,57 +252,29 @@ string map_state(vector<vector<string> > state) {
         }
 
 void ExpandState(puzzle_state current, priority_queue<puzzle_state> &states, \
-                vector<string> &explored_states, const string &h) {
+                map<string, bool> &explored_states, const string &h) {
     puzzle_state puzzle_up = current.CreateUp(current);
-    string up_map = map_state(puzzle_up.GetState());
     puzzle_state puzzle_down = current.CreateDown(current);
-    string down_map = map_state(puzzle_down.GetState());
     puzzle_state puzzle_left = current.CreateLeft(current);
-    string left_map = map_state(puzzle_left.GetState());
     puzzle_state puzzle_right = current.CreateRight(current);
-    string right_map = map_state(puzzle_right.GetState());
-    bool repeat_up = 0;
-    bool repeat_down = 0;
-    bool repeat_left = 0;
-    bool repeat_right = 0;
-    explored_states.push_back(map_state(current.GetState()));
-    for (unsigned i = 0; i < explored_states.size(); ++i) {
-        if (explored_states.at(i) == up_map) {
-            repeat_up = 1;
-        }
-        else if (explored_states.at(i) == down_map) {
-            repeat_down = 1;
-        }
-        else if (explored_states.at(i) == left_map) {
-            repeat_left = 1;
-        }
-        else if (explored_states.at(i) == right_map) {
-            repeat_right = 1;
-        }
-    }
-    // cout << "------------------------------------------" << endl;
-    if (!(repeat_up)) {
+
+    explored_states[map_state(current.GetState())] = 1;
+    if (explored_states[map_state(puzzle_up.GetState())] == 0) {
         puzzle_up.SetCosts(h);
         states.push(puzzle_up);
-        // cout << "up_map: " << up_map << endl;
     }
-    if (!(repeat_down)) {
+    if (explored_states[map_state(puzzle_down.GetState())] == 0) {
         puzzle_down.SetCosts(h);
         states.push(puzzle_down);
-        // cout << "down_map: " << down_map << endl;
     }
-    if (!(repeat_left)) {
+    if (explored_states[map_state(puzzle_left.GetState())] == 0) {
         puzzle_left.SetCosts(h);
         states.push(puzzle_left);
-        // cout << "left_map: " << left_map << endl;
     }
-    if (!(repeat_right)) {
+    if (explored_states[map_state(puzzle_right.GetState())] == 0) {
         puzzle_right.SetCosts(h);
         states.push(puzzle_right);
-        // cout << "right_map: " << right_map << endl;
     }
-    // cout << "------------------------------------------" << endl;
-
 }
 
 bool CheckGoal(const puzzle_state &my_puzzle) {

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <map>
 #include <algorithm>
 #include "puzzle_state.h"
 
@@ -69,14 +70,13 @@ int main() {
 
     puzzle_state my_puzzle(puzzle);
     priority_queue<puzzle_state> states;
-    vector<string> explored_states;
+    map<string, bool> explored_states;
     vector<puzzle_state> explored;
 
     states.push(my_puzzle);
-    const unsigned queue_cap = 30000; // used "hardest" 8 puzzle for MD, see attachment
     unsigned max_queue_size = states.size();
     unsigned nodes_expanded = 0;
-    while(!states.empty() && states.size() < queue_cap) {
+    while(!states.empty()) {
         if (max_queue_size < states.size()) {
             max_queue_size = states.size();
         }
@@ -97,7 +97,6 @@ int main() {
             cout << "Initial state is: " << endl;
         }
         PrintState(current);
-        // cout << "Heap size: " << states.size() << endl;
         explored.push_back(current);
         ExpandState(current, states, explored_states, h_type);
         ++nodes_expanded;
