@@ -66,13 +66,11 @@ int main() {
 
     string h_type;
     cout << "Pick an algorithm: MT, MD, or UCS" << endl;
-    cin >> h_type;
+    cin >> h_type; // defaults to UCS
 
     puzzle_state my_puzzle(puzzle);
     priority_queue<puzzle_state> states;
     map<string, bool> explored_states;
-    vector<puzzle_state> explored;
-
     states.push(my_puzzle);
     unsigned max_queue_size = states.size();
     unsigned nodes_expanded = 0;
@@ -88,6 +86,8 @@ int main() {
             cout << "Depth of goal node: " << current.GetG_Cost() << endl;
             cout << "Number of nodes expanded: " << nodes_expanded << endl;
             cout << "Max queue size: " << max_queue_size << endl;
+            vector<puzzle_state> path;
+            GetPath(current, path);
             return 0;
         }
         if (max_queue_size != 1) {
@@ -97,15 +97,12 @@ int main() {
             cout << "Initial state is: " << endl;
         }
         PrintState(current);
-        explored.push_back(current);
         ExpandState(current, states, explored_states, h_type);
         ++nodes_expanded;
+        string test;
     }
     cout << "No solution found" << endl;
     cout << "Number of nodes expanded: " << nodes_expanded << endl;
     cout << "Max queue size: " << max_queue_size << endl;
-
-
-
     return 0;
 }

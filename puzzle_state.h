@@ -13,7 +13,7 @@ const unsigned puzzle_size = 3;
 class puzzle_state {
     private:
         vector<vector<string> > puzzle;
-        puzzle_state* prev_state; // unused -- incorrect implementation, wanted to make a linked list...
+        puzzle_state* prev_state; // unused -- wanted to make a linked list
         unsigned g_cost;
         unsigned h_cost;
         pair<int, int> blank;
@@ -24,7 +24,7 @@ class puzzle_state {
             h_cost = 0;
             blank = make_pair(0, 0);
         }
-        // Used for initial state
+
         puzzle_state(vector<vector<string> > puzzle) {
             this->puzzle = puzzle;
             prev_state = NULL;
@@ -41,6 +41,7 @@ class puzzle_state {
                 cout << endl;
             }
         }
+
         vector<vector<string> > GetState() const {
             return this->puzzle;
         }
@@ -135,9 +136,9 @@ class puzzle_state {
             if (puzzle_map.at(puzzle_map.size() - 1) != 0) {
                 num_MT += 1;
             }
-            // cout << "MT: " << num_MT << endl;
             return num_MT;
         }
+
         unsigned MDCost() {
             unsigned num_MD = 0;
             unsigned MD_sum = 0;
@@ -146,9 +147,6 @@ class puzzle_state {
             // Need to check 0 manually
             for (int i = 0; i < puzzle.size(); ++i) {
                 for (int j = 0; j < puzzle.at(i).size() && num != puzzle.size() * puzzle.size(); ++j) {
-                    // cout << "Checking " << i << " " << j << " for " << num;
-                    // cout << "... found " << puzzle.at(i).at(j) << endl;
-
                     // If we find a mismatch we find the position the tile is supposed to be
                     // in and calculate it
                     if (puzzle.at(i).at(j) != to_string(num)) {
@@ -163,7 +161,6 @@ class puzzle_state {
                     ++num;
                 }
             }
-
             if (puzzle.at(puzzle.size()-1).at(puzzle.size()-1) != "0") {
                 for (int i = 0; i < puzzle.size(); ++i) {
                     for (int j = 0; j < puzzle.size(); ++j) {
@@ -176,6 +173,8 @@ class puzzle_state {
             }
             return MD_sum;
         }
+
+        // finds position of '0'
         pair<int, int> CalcBlank() {
             for (int i = 0; i < puzzle.size(); ++i) {
                 for(int j = 0; j < puzzle.at(i).size(); ++j) {
@@ -189,6 +188,7 @@ class puzzle_state {
             pair<int, int> blank_rc(-1, -1);
             return blank_rc;
         }
+
         unsigned CalcF_Cost() const {
             return GetG_Cost() + GetH_Cost();
         }
@@ -200,25 +200,22 @@ class puzzle_state {
         }
 
         // Performs operation on my_puzzle, sets pointer to implicit object, return my_puzzle
-        // Wanted to make a linked list of some sort but it didn't work out
+        // Originally wanted to set pointers to create a linked list of some sort
+        // To return an optimal path at the end
         puzzle_state CreateUp(puzzle_state my_puzzle) {
             my_puzzle.MoveUp();
-            my_puzzle.prev_state = this;
             return my_puzzle;
         }
         puzzle_state CreateDown(puzzle_state my_puzzle) {
             my_puzzle.MoveDown();
-            my_puzzle.prev_state = this;
             return my_puzzle;
         }
         puzzle_state CreateLeft(puzzle_state my_puzzle) {
             my_puzzle.MoveLeft();
-            my_puzzle.prev_state = this;
             return my_puzzle;
         }
         puzzle_state CreateRight(puzzle_state my_puzzle) {
             my_puzzle.MoveRight();
-            my_puzzle.prev_state = this;
             return my_puzzle;
         }
 
@@ -241,15 +238,16 @@ class puzzle_state {
         }
 };
 
+// Turns 2D vector to 1D for mapping and checking goal state
 string map_state(vector<vector<string> > state) {
-            string state_map;
-            for (unsigned i = 0; i < state.size(); ++i) {
-                for (unsigned j = 0; j < state.at(i).size(); ++j) {
-                    state_map.append(state.at(i).at(j));
-                }
-            }
-            return state_map;
+    string state_map;
+    for (unsigned i = 0; i < state.size(); ++i) {
+        for (unsigned j = 0; j < state.at(i).size(); ++j) {
+            state_map.append(state.at(i).at(j));
         }
+    }
+    return state_map;
+}
 
 void ExpandState(puzzle_state current, priority_queue<puzzle_state> &states, \
                 map<string, bool> &explored_states, const string &h) {
@@ -285,9 +283,5 @@ bool CheckGoal(const puzzle_state &my_puzzle) {
     }
     return false;
 }
-
-
-
-
 
 #endif
